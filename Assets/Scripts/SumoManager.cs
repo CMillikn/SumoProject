@@ -1,12 +1,22 @@
+using System.Collections;
 using UnityEngine;
 
 public class SumoManager : MonoBehaviour
 {
-    public float firstPlayerHealth;
-    public float secondPlayerHealth;
+    public float firstPlayerScore;
+    public float secondPlayerScore;
     public bool firstPlayerLost;
     public bool secondPlayerLost;
     public float gameTimer;
+    public bool gameStarted;
+    public bool fistHitP1;
+    public bool fistHitP2;
+    public bool fistBlockedP1;
+    public bool fistBlockedP2;
+    public bool stepOutP1;
+    public bool stepOutP2;
+    
+
     void Start()
     {
 
@@ -14,34 +24,114 @@ public class SumoManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            firstPlayerHealth--;
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            secondPlayerHealth--;
-        }
-        if (gameTimer < 0)
-        {
-            if (firstPlayerHealth < secondPlayerHealth)
+            if (!fistHitP1)
             {
-                firstPlayerLost = true;
-                secondPlayerLost = false;
-            }
-            else if (firstPlayerHealth > secondPlayerHealth)
-            {
-                firstPlayerLost = false;
-                secondPlayerLost = true;
+                StartCoroutine(P1FistHitEnum());
             }
         }
-        if (firstPlayerHealth < 0)
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            firstPlayerLost = true;
+            if (!fistHitP2)
+            {
+                StartCoroutine(P2FistHitEnum());
+            }
         }
-        if (secondPlayerHealth < 0)
+
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            secondPlayerLost = true;
+            if (!fistBlockedP1)
+            {
+                StartCoroutine(P1BlockedEnum());
+            }
         }
+
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            if (!fistBlockedP2)
+            {
+                StartCoroutine(P2BlockedEnum());
+            }
+        }
+    }
+
+    IEnumerator P1FistHitEnum()
+    {
+        fistHitP1 = true;
+        yield return new WaitForSeconds(0.1f);
+        if (fistHitP2)
+        {
+            Clash();
+        }
+        else if (fistBlockedP1)
+        {
+            P1Blocked();
+        }
+        else
+        {
+            P1Score();
+        }
+        fistHitP1 = false;
+    }
+
+    IEnumerator P2FistHitEnum()
+    {
+        fistHitP2 = true;
+        yield return new WaitForSeconds(0.1f);
+        if (fistHitP1)
+        {
+            Clash();
+        }
+        else if (fistBlockedP2)
+        {
+            P2Blocked();
+        }
+        else
+        {
+            P2Score();
+        }
+        fistHitP2 = false;
+    }
+
+    IEnumerator P1BlockedEnum()
+    {
+        fistBlockedP1 = true;
+        yield return new WaitForSeconds(0.1f);
+        fistBlockedP1 = false;
+    }
+
+    IEnumerator P2BlockedEnum()
+    {
+        fistBlockedP2 = true;
+        yield return new WaitForSeconds(0.1f);
+        fistBlockedP2 = false;
+    }
+
+    void Clash()
+    {
+        firstPlayerScore++;
+        secondPlayerScore++;
+    }
+
+    void P1Score()
+    {
+        firstPlayerScore += 3;
+    }
+
+    void P2Score()
+    {
+        secondPlayerScore +=  3;
+    }
+
+    void P1Blocked()
+    {
+        firstPlayerScore -= 2;
+    }
+
+    void P2Blocked()
+    {
+        secondPlayerScore -= 2;
     }
 }
